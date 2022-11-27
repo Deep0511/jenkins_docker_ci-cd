@@ -16,11 +16,14 @@ stage ('Login to ECR') {
 stage ('Push To ECR') {
    sh "docker push 623158369342.dkr.ecr.ap-south-1.amazonaws.com/java-web-application:${buildnumber}"   
 }
-
-stage ('Deploy-On-Container-On-Server'){
- sshagent(['ssh-agent']) {
-sh "ssh -o StrictHostKeyChecking=no ubuntu@172.31.38.68 ./run_script.sh "
-        
-    }
+// Remove local image in Jenkins Server
+stage ("Remove Local Image") {
+sh "docker rmi -f 623158369342.dkr.ecr.ap-south-1.amazonaws.com/java-web-application:${buildnumber}"
+}
+stage("Deploy to ") {
+sshagent(['ssh-agent']) {
+sh "scp -o Strict HostKeyChecking=no docker-compose.yml ubuntu@172.31.38.68:/home/ubuntu"
+sh "ssh Strict HostKeyChecking=no ubuntu@172.31.38.68 docker-compose up -d"
+}
 }
 }
